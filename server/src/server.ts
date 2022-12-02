@@ -413,12 +413,18 @@ let openMethod: OpenMethod = null;
 function GetMethodStart(statement: MultiLineStatement, uri: string): boolean {
 	let line = statement.GetFullStatement();
 
-	let rex:RegExp = /^[ \t]*(public[ \t]+|private[ \t]+)?(function|sub)([ \t]+)([a-zA-Z0-9\-\_]+)([ \t]*)(\(([a-zA-Z0-9\_\-, \t(\(\))]*)\))?[ \t]*$/gi;
+	let rex:RegExp = /^[ \t]*(public[ \t]+|private[ \t]+)?(shared[ \t]+)?(function|sub)([ \t]+)([a-zA-Z0-9\-\_]+)([ \t]*)(\(([a-zA-Z0-9\_\-, \t(\(\))]*)\))?[ \t]*$/gi;
 	let regexResult = rex.exec(line);
 
 	if(regexResult == null || regexResult.length < 6)
 		return;
-
+	let regexLen = regexResult.length;
+	for (var i = 1; i < regexLen; i++){
+		if(regexResult[i] == undefined || regexResult[i].toLowerCase() == 'shared '){
+			regexResult.splice(i,1);
+			regexLen--;
+		}
+	}
 	if(openMethod == null) {
 		let leadingSpaces = GetNumberOfFrontSpaces(line);
 		let preLength = leadingSpaces + regexResult.index;
